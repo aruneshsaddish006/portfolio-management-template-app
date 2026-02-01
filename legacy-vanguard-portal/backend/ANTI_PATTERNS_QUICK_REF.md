@@ -179,17 +179,6 @@ END$$
 
 ---
 
-## Files to Upload to Slingshot
-
-**Essential (7 files):**
-1. BalanceServiceImpl.java
-2. HoldingsDAOImpl.java
-3. AccountsOverviewServlet.java
-4. BalancesHoldingsServlet.java
-5. MarketDataServiceImpl.java
-6. BalanceAggregationJob.java
-7. schema.sql
-
 **Supporting (3 files):**
 8. pom.xml
 9. web.xml

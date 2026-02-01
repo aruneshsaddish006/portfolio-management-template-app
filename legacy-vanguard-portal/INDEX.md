@@ -101,17 +101,6 @@ All located in `frontend/` directory
 | **BUILD_SUMMARY.md** | Build completion summary | To verify everything is built |
 | **INDEX.md** | This file - complete index | To find specific files |
 | **README.md** | Original README | Legacy reference |
-
-
-### **Backend Documentation**
-
-| File | Location | Purpose |
-|------|----------|---------|
-| **BACKEND_README.md** | `backend/` | Backend architecture overview |
-| **ANTI_PATTERNS_QUICK_REF.md** | `backend/` | Quick anti-pattern reference |
-| **SLINGSHOT_GUIDE.md** | `backend/` | Slingshot expectations |
-| **PROJECT_STATS.txt** | `backend/` | Code statistics |
-
 ---
 
 ## 🗂️ Complete Directory Tree
@@ -124,7 +113,6 @@ legacy-vanguard-portal/
 ├── 📄 BUILD_SUMMARY.md                 Build verification
 ├── 📄 INDEX.md                         This file
 ├── 📄 README.md                        Original README
-├── 📄 SLINGSHOT_UPLOAD_GUIDE.md       Slingshot guide
 ├── 📄 MODERNIZATION_CASE.md           Business case ($3.6M ROI)
 ├── 📄 MASTER_README.md                Complete overview
 ├── 📄 QUICKSTART.md                   Quick start
@@ -141,7 +129,6 @@ legacy-vanguard-portal/
     ├── 📄 pom.xml                      Maven config
     ├── 📄 BACKEND_README.md           Backend docs
     ├── 📄 ANTI_PATTERNS_QUICK_REF.md  Anti-pattern ref
-    ├── 📄 SLINGSHOT_GUIDE.md          Slingshot info
     ├── 📄 PROJECT_STATS.txt           Code stats
     │
     ├── 📁 src/main/java/com/vanguard/portal/

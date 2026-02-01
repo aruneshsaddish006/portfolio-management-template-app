@@ -165,10 +165,6 @@ Deploy the generated WAR file (`target/vanguard-portal.war`) to:
 7. **Implement batch processing framework** - Spring Batch for restart capability
 8. **Add comprehensive test coverage** - Unit, integration, performance tests
 
-## Use with Slingshot
-
-This codebase is designed for analysis with Anthropic's Slingshot modernization tool. See `SLINGSHOT_GUIDE.md` for details on uploading and analyzing this code.
-
 ## Questions or Issues?
 
 This is a demonstration codebase for legacy modernization scenarios. The anti-patterns are intentional and documented for educational purposes.

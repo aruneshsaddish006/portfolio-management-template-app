@@ -19,14 +19,6 @@ This repository contains a **realistic legacy asset management portfolio system*
 - **6 critical security vulnerabilities** (CVEs and injection flaws)
 - **Realistic domain model** with accounts, holdings, transactions, and risk analytics
 
-### The Solution
-This repository provides a **realistic legacy codebase** that demonstrates:
-1. **Common anti-patterns** found in 20+ year old enterprise applications
-2. **Real security vulnerabilities** that modernization must address
-3. **Complex business logic** trapped in databases and monolithic services
-4. **Like-for-like behavior preservation** challenges during migration
-5. **AI-assisted analysis** using tools like Slingshot to understand the system
-
 ---
 
 ## 🏗️ System Architecture
@@ -159,7 +151,6 @@ This repository provides a **realistic legacy codebase** that demonstrates:
 
 ## ⚠️ Legacy Anti-Patterns
 
-This codebase intentionally includes **9 realistic anti-patterns** that Slingshot and other analysis tools will detect:
 
 ### 1. **N+1 Query Problem** 🔴
 - **Location**: `BalanceServiceImpl.java` (lines 67-86)
@@ -273,12 +264,10 @@ legacy-vanguard-portal/
 │   ├── pom.xml                         # Maven dependencies
 │   ├── BACKEND_README.md               # Backend documentation
 │   ├── ANTI_PATTERNS_QUICK_REF.md      # Anti-pattern reference
-│   └── SLINGSHOT_GUIDE.md              # Slingshot upload guide
 │
 ├── docs/                               # Documentation
 │   ├── MASTER_README.md                # Complete overview
 │   ├── MODERNIZATION_CASE.md           # $3.6M business case
-│   ├── SLINGSHOT_UPLOAD_GUIDE.md       # Slingshot integration
 │   ├── QUICKSTART.md                   # 30-second start guide
 │   └── FEATURES.md                     # Feature breakdown
 │
@@ -328,22 +317,6 @@ $TOMCAT_HOME/bin/catalina.sh run
 # 6. Access application
 open http://localhost:8080/vanguard-portal/accounts
 ```
-
-### Option 3: Upload to Slingshot for Analysis
-
-```bash
-# Zip the entire repository
-cd legacy-vanguard-portal
-zip -r legacy-vanguard-portal.zip . -x "*.git*" -x "*node_modules*"
-
-# Upload to Publicis Sapient Slingshot
-# 1. Go to Slingshot web interface
-# 2. Create new project: "Legacy Vanguard Modernization"
-# 3. Upload legacy-vanguard-portal.zip
-# 4. Wait 5-10 minutes for analysis
-# 5. Download generated .md files
-```
-
 ## 🔧 Modernization Opportunities
 
 ### Phase 1: Critical Security Fixes (Months 1-3)

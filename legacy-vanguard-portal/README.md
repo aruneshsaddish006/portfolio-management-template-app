@@ -192,9 +192,7 @@ Click any column header with ⇅ icon to sort:
 - Totals row with bold styling
 - Color-coded gains/losses
 
-## For Modernization Projects
-
-This portal demonstrates a **realistic legacy application** that would be analyzed by tools like Slingshot Shepard for modernization:
+## For Modernization Project
 
 **Features to Modernize:**
 1. ✨ Asset Mix Chart → Modern donut chart with red gradients
@@ -237,7 +235,4 @@ This portal demonstrates a **realistic legacy application** that would be analyz
 Demonstration code for legacy application modernization projects.
 
 ---
-
-**Created for:** Slingshot Shepard - Legacy Application Modernization Platform
-**Date:** January 31, 2026
 **Purpose:** Demonstrate realistic legacy financial portal for modernization analysis

@@ -18,7 +18,6 @@ legacy-vanguard-portal/
 │
 └── ☕ Backend (Java Code )
     ├── BACKEND_README.md            ← Backend architecture overview
-    ├── SLINGSHOT_GUIDE.md           ← How to upload to Slingshot
     ├── ANTI_PATTERNS_QUICK_REF.md   ← Quick reference for anti-patterns
     ├── PROJECT_STATS.txt            ← Code statistics
     ├── pom.xml                      ← Maven config with legacy dependencies
@@ -63,11 +62,6 @@ python3 -m http.server 8080
 ```
 ✅ **Best for:** Professional demos, avoiding CORS issues
 
-### Option 3: Analyze Backend with Slingshot
-```bash
-cd legacy-vanguard-portal/backend
-# Upload to Slingshot: src/main/java/**/*.java
-```
 ✅ **Best for:** Modernization analysis, risk assessment, AI-assisted refactoring
 
 ---
@@ -125,9 +119,7 @@ cd legacy-vanguard-portal/backend
 
 ---
 
-## 🔒 Security Vulnerabilities (Intentional)
-
-> ⚠️ **Note:** These vulnerabilities are INTENTIONALLY included for educational purposes and Slingshot analysis. Do NOT deploy this code to production.
+## 🔒 Security Vulnerabilities 
 
 | Severity | Issue | Location | CVSS Score |
 |----------|-------|----------|------------|

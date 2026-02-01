@@ -1,10 +1,6 @@
 ================================================================================
 LEGACY VANGUARD PORTAL - BACKEND CODEBASE STATISTICS
 ================================================================================
-
-Created: 2026-01-31
-Purpose: Realistic legacy Java codebase for Slingshot modernization analysis
-
 --------------------------------------------------------------------------------
 FILE COUNTS
 --------------------------------------------------------------------------------
@@ -57,7 +53,7 @@ com.vanguard.portal
 └── util/                       (1 file)  - Utilities
 
 --------------------------------------------------------------------------------
-CRITICAL FILES FOR SLINGSHOT ANALYSIS
+CRITICAL FILES FOR ANALYSIS
 --------------------------------------------------------------------------------
 Priority 1 (Must Upload):
   1. BalanceServiceImpl.java          - N+1 query problem
@@ -127,16 +123,6 @@ Test Coverage:                 0%
 (This is intentional to reflect realistic legacy codebase)
 
 --------------------------------------------------------------------------------
-DOCUMENTATION
---------------------------------------------------------------------------------
-BACKEND_README.md              - Architecture overview and issues
-SLINGSHOT_GUIDE.md             - How to analyze with Slingshot
-ANTI_PATTERNS_QUICK_REF.md     - Quick reference for all anti-patterns
-PROJECT_STATS.txt              - This file
-
-Total Documentation:           ~1,200 lines
-
---------------------------------------------------------------------------------
 REALISTIC LEGACY CHARACTERISTICS
 --------------------------------------------------------------------------------
 ✓ Outdated dependencies (Spring 4.x, Log4j 1.2)
@@ -149,16 +135,5 @@ REALISTIC LEGACY CHARACTERISTICS
 ✓ No caching layer
 ✓ Hardcoded configuration values
 ✓ Verbose boilerplate code
-
---------------------------------------------------------------------------------
-USAGE INSTRUCTIONS
---------------------------------------------------------------------------------
-1. Upload critical files (7 files) to Slingshot
-2. Ask for comprehensive analysis
-3. Request specific anti-pattern fixes
-4. Generate modernization roadmap
-5. Prioritize security fixes first
-
-See SLINGSHOT_GUIDE.md for detailed instructions.
 
 ================================================================================
