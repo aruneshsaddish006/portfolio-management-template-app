@@ -1,0 +1,695 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Transaction History - Vanguard Portfolio</title>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    /* Header - Vanguard Style */
+    .header {
+      background: #c00;
+      color: white;
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .logo {
+      background: #a00;
+      padding: 0 1.5rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 0;
+      height: 100%;
+      align-items: stretch;
+      margin-left: 2rem;
+    }
+
+    .header-nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      padding: 0 1.25rem;
+      display: flex;
+      align-items: center;
+      border-bottom: 4px solid transparent;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .header-nav a:hover {
+      background: rgba(0, 0, 0, 0.1);
+      border-bottom-color: #ff0;
+    }
+
+    .header-nav a.active {
+      border-bottom-color: white;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .header-right {
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-info {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+      font-size: 1.875rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+      font-size: 0.9375rem;
+      color: #6b7280;
+    }
+
+    /* Filters */
+    .filters {
+      background: white;
+      padding: 1.5rem;
+      margin-bottom: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(200px, 1fr));
+      gap: 1.5rem;
+    }
+
+    .filter-item {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .filter-item label {
+      font-size: 0.8125rem;
+      color: #6b7280;
+      font-weight: 600;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .filter-item select,
+    .filter-item input {
+      padding: 0.625rem 0.75rem;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 0.9375rem;
+      background: white;
+      color: #374151;
+    }
+
+    .filter-item select:focus,
+    .filter-item input:focus {
+      outline: none;
+      border-color: #c00;
+      box-shadow: 0 0 0 3px rgba(204, 0, 0, 0.1);
+    }
+
+    .filter-actions {
+      display: flex;
+      gap: 1rem;
+      align-items: flex-end;
+    }
+
+    .btn {
+      padding: 0.625rem 1.25rem;
+      border: none;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-weight: 600;
+      cursor: pointer;
+      transition: all 0.2s;
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+    }
+
+    .btn-primary {
+      background: #c00;
+      color: white;
+    }
+
+    .btn-primary:hover {
+      background: #a00;
+      box-shadow: 0 2px 8px rgba(204, 0, 0, 0.3);
+    }
+
+    .btn-secondary {
+      background: white;
+      color: #374151;
+      border: 1px solid #d1d5db;
+    }
+
+    .btn-secondary:hover {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+
+    /* Summary Cards */
+    .summary-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .summary-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .summary-card h3 {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 0.75rem;
+    }
+
+    .summary-card .value {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .summary-card .subvalue {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+
+    .positive {
+      color: #10b981;
+    }
+
+    .negative {
+      color: #ef4444;
+    }
+
+    /* Transactions Table */
+    .table-container {
+      background: white;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow: hidden;
+    }
+
+    .table-header {
+      padding: 1.5rem;
+      border-bottom: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .table-header h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #111827;
+    }
+
+    .table-wrapper {
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table th {
+      text-align: left;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 1rem 1.5rem;
+      border-bottom: 2px solid #e5e7eb;
+      background: #f9fafb;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    table th:hover {
+      color: #c00;
+    }
+
+    table th.sortable::after {
+      content: ' ⇅';
+      opacity: 0.3;
+    }
+
+    table td {
+      padding: 1rem 1.5rem;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 0.9375rem;
+      color: #374151;
+    }
+
+    table tr:hover {
+      background: #f9fafb;
+    }
+
+    table tr:last-child td {
+      border-bottom: none;
+    }
+
+    .transaction-type {
+      display: inline-block;
+      padding: 0.25rem 0.75rem;
+      border-radius: 9999px;
+      font-size: 0.8125rem;
+      font-weight: 600;
+    }
+
+    .type-buy {
+      background: #dbeafe;
+      color: #1e40af;
+    }
+
+    .type-sell {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    .type-dividend {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .type-contribution {
+      background: #e0e7ff;
+      color: #3730a3;
+    }
+
+    .type-fee {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .symbol-link {
+      color: #c00;
+      font-weight: 600;
+      text-decoration: none;
+    }
+
+    .symbol-link:hover {
+      text-decoration: underline;
+    }
+
+    /* Pagination */
+    .pagination {
+      padding: 1.5rem;
+      border-top: 1px solid #e5e7eb;
+      display: flex;
+      justify-content: space-between;
+      align-items: center;
+    }
+
+    .pagination-info {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .pagination-buttons {
+      display: flex;
+      gap: 0.5rem;
+    }
+
+    .page-btn {
+      padding: 0.5rem 1rem;
+      border: 1px solid #d1d5db;
+      background: white;
+      color: #374151;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .page-btn:hover:not(:disabled) {
+      background: #f9fafb;
+      border-color: #9ca3af;
+    }
+
+    .page-btn:disabled {
+      opacity: 0.5;
+      cursor: not-allowed;
+    }
+
+    .page-btn.active {
+      background: #c00;
+      color: white;
+      border-color: #c00;
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">Vanguard</div>
+      <nav class="header-nav">
+        <a href="accounts-overview.html">Accounts Overview</a>
+        <a href="balances-holdings.html">Balances & Holdings</a>
+        <a href="portfolio-performance.html">Performance</a>
+        <a href="transactions.html" class="active">Transactions</a>
+        <a href="risk-analysis.html">Risk Analysis</a>
+      </nav>
+    </div>
+    <div class="header-right">
+      <span class="user-info">Jacob Michelini</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="page-header">
+      <h1>Transaction History</h1>
+      <p>View and export your complete transaction history across all accounts</p>
+    </div>
+
+    <!-- Filters -->
+    <div class="filters">
+      <div class="filter-item">
+        <label for="accountFilter">Account</label>
+        <select id="accountFilter">
+          <option value="all">All Accounts</option>
+          <option value="3421">Individual Investment (****3421)</option>
+          <option value="8764">Roth IRA (****8764)</option>
+          <option value="2109">Traditional IRA (****2109)</option>
+          <option value="5632">Joint Account (****5632)</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <label for="typeFilter">Transaction Type</label>
+        <select id="typeFilter">
+          <option value="all">All Types</option>
+          <option value="buy">Buy</option>
+          <option value="sell">Sell</option>
+          <option value="dividend">Dividend</option>
+          <option value="contribution">Contribution</option>
+          <option value="fee">Fees</option>
+        </select>
+      </div>
+      <div class="filter-item">
+        <label for="dateFrom">From Date</label>
+        <input type="date" id="dateFrom" value="2024-01-01">
+      </div>
+      <div class="filter-item">
+        <label for="dateTo">To Date</label>
+        <input type="date" id="dateTo" value="2024-01-31">
+      </div>
+      <div class="filter-actions">
+        <button class="btn btn-primary">Apply Filters</button>
+        <button class="btn btn-secondary">Export CSV</button>
+      </div>
+    </div>
+
+    <!-- Summary Cards -->
+    <div class="summary-grid">
+      <div class="summary-card">
+        <h3>Total Transactions</h3>
+        <div class="value">247</div>
+        <div class="subvalue">This period</div>
+      </div>
+      <div class="summary-card">
+        <h3>Net Cash Flow</h3>
+        <div class="value positive">+$12,438.92</div>
+        <div class="subvalue">Contributions - Withdrawals</div>
+      </div>
+      <div class="summary-card">
+        <h3>Dividends Received</h3>
+        <div class="value positive">+$2,847.65</div>
+        <div class="subvalue">32 dividend payments</div>
+      </div>
+      <div class="summary-card">
+        <h3>Total Fees</h3>
+        <div class="value negative">-$124.50</div>
+        <div class="subvalue">Management & transaction fees</div>
+      </div>
+    </div>
+
+    <!-- Transactions Table -->
+    <div class="table-container">
+      <div class="table-header">
+        <h2>Recent Transactions</h2>
+      </div>
+      <div class="table-wrapper">
+        <table>
+          <thead>
+            <tr>
+              <th class="sortable">Date</th>
+              <th class="sortable">Type</th>
+              <th class="sortable">Account</th>
+              <th class="sortable">Symbol</th>
+              <th>Description</th>
+              <th class="sortable">Quantity</th>
+              <th class="sortable">Price</th>
+              <th class="sortable">Amount</th>
+            </tr>
+          </thead>
+          <tbody>
+            <tr>
+              <td>Jan 30, 2024</td>
+              <td><span class="transaction-type type-dividend">Dividend</span></td>
+              <td>****3421</td>
+              <td><a href="#" class="symbol-link">MSFT</a></td>
+              <td>Quarterly Dividend Payment</td>
+              <td>—</td>
+              <td>$0.75/share</td>
+              <td class="positive">+$150.00</td>
+            </tr>
+            <tr>
+              <td>Jan 29, 2024</td>
+              <td><span class="transaction-type type-buy">Buy</span></td>
+              <td>****3421</td>
+              <td><a href="#" class="symbol-link">AAPL</a></td>
+              <td>Market Buy Order</td>
+              <td>10</td>
+              <td>$187.92</td>
+              <td class="negative">-$1,879.20</td>
+            </tr>
+            <tr>
+              <td>Jan 28, 2024</td>
+              <td><span class="transaction-type type-dividend">Dividend</span></td>
+              <td>****8764</td>
+              <td><a href="#" class="symbol-link">VTI</a></td>
+              <td>Quarterly Dividend Payment</td>
+              <td>—</td>
+              <td>$0.92/share</td>
+              <td class="positive">+$460.00</td>
+            </tr>
+            <tr>
+              <td>Jan 26, 2024</td>
+              <td><span class="transaction-type type-contribution">Contribution</span></td>
+              <td>****8764</td>
+              <td>—</td>
+              <td>IRA Contribution - 2024</td>
+              <td>—</td>
+              <td>—</td>
+              <td class="positive">+$7,000.00</td>
+            </tr>
+            <tr>
+              <td>Jan 25, 2024</td>
+              <td><span class="transaction-type type-sell">Sell</span></td>
+              <td>****2109</td>
+              <td><a href="#" class="symbol-link">BND</a></td>
+              <td>Market Sell Order</td>
+              <td>50</td>
+              <td>$74.12</td>
+              <td class="positive">+$3,706.00</td>
+            </tr>
+            <tr>
+              <td>Jan 24, 2024</td>
+              <td><span class="transaction-type type-buy">Buy</span></td>
+              <td>****3421</td>
+              <td><a href="#" class="symbol-link">NVDA</a></td>
+              <td>Market Buy Order</td>
+              <td>15</td>
+              <td>$634.92</td>
+              <td class="negative">-$9,523.80</td>
+            </tr>
+            <tr>
+              <td>Jan 23, 2024</td>
+              <td><span class="transaction-type type-fee">Fee</span></td>
+              <td>****3421</td>
+              <td>—</td>
+              <td>Quarterly Management Fee</td>
+              <td>—</td>
+              <td>—</td>
+              <td class="negative">-$81.15</td>
+            </tr>
+            <tr>
+              <td>Jan 22, 2024</td>
+              <td><span class="transaction-type type-dividend">Dividend</span></td>
+              <td>****3421</td>
+              <td><a href="#" class="symbol-link">GOOGL</a></td>
+              <td>Special Dividend Payment</td>
+              <td>—</td>
+              <td>$1.25/share</td>
+              <td class="positive">+$125.00</td>
+            </tr>
+            <tr>
+              <td>Jan 20, 2024</td>
+              <td><span class="transaction-type type-sell">Sell</span></td>
+              <td>****5632</td>
+              <td><a href="#" class="symbol-link">QQQ</a></td>
+              <td>Market Sell Order</td>
+              <td>5</td>
+              <td>$421.18</td>
+              <td class="positive">+$2,105.90</td>
+            </tr>
+            <tr>
+              <td>Jan 19, 2024</td>
+              <td><span class="transaction-type type-buy">Buy</span></td>
+              <td>****8764</td>
+              <td><a href="#" class="symbol-link">VXUS</a></td>
+              <td>Market Buy Order</td>
+              <td>50</td>
+              <td>$61.23</td>
+              <td class="negative">-$3,061.50</td>
+            </tr>
+            <tr>
+              <td>Jan 18, 2024</td>
+              <td><span class="transaction-type type-contribution">Contribution</span></td>
+              <td>****2109</td>
+              <td>—</td>
+              <td>IRA Contribution - 2024</td>
+              <td>—</td>
+              <td>—</td>
+              <td class="positive">+$6,500.00</td>
+            </tr>
+            <tr>
+              <td>Jan 17, 2024</td>
+              <td><span class="transaction-type type-dividend">Dividend</span></td>
+              <td>****5632</td>
+              <td><a href="#" class="symbol-link">SPY</a></td>
+              <td>Quarterly Dividend Payment</td>
+              <td>—</td>
+              <td>$1.67/share</td>
+              <td class="positive">+$83.50</td>
+            </tr>
+            <tr>
+              <td>Jan 16, 2024</td>
+              <td><span class="transaction-type type-buy">Buy</span></td>
+              <td>****3421</td>
+              <td><a href="#" class="symbol-link">MSFT</a></td>
+              <td>Market Buy Order</td>
+              <td>25</td>
+              <td>$412.45</td>
+              <td class="negative">-$10,311.25</td>
+            </tr>
+            <tr>
+              <td>Jan 15, 2024</td>
+              <td><span class="transaction-type type-fee">Fee</span></td>
+              <td>****8764</td>
+              <td>—</td>
+              <td>Annual Custodial Fee</td>
+              <td>—</td>
+              <td>—</td>
+              <td class="negative">-$25.00</td>
+            </tr>
+            <tr>
+              <td>Jan 12, 2024</td>
+              <td><span class="transaction-type type-sell">Sell</span></td>
+              <td>****2109</td>
+              <td><a href="#" class="symbol-link">AGG</a></td>
+              <td>Market Sell Order</td>
+              <td>30</td>
+              <td>$99.45</td>
+              <td class="positive">+$2,983.50</td>
+            </tr>
+          </tbody>
+        </table>
+      </div>
+      <div class="pagination">
+        <div class="pagination-info">
+          Showing 1-15 of 247 transactions
+        </div>
+        <div class="pagination-buttons">
+          <button class="page-btn" disabled>Previous</button>
+          <button class="page-btn active">1</button>
+          <button class="page-btn">2</button>
+          <button class="page-btn">3</button>
+          <button class="page-btn">4</button>
+          <button class="page-btn">5</button>
+          <button class="page-btn">Next</button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Simple filter and sort interactions
+    document.querySelectorAll('th.sortable').forEach(th => {
+      th.addEventListener('click', function() {
+        console.log('Sorting by:', this.textContent);
+      });
+    });
+
+    document.querySelector('.btn-primary').addEventListener('click', function() {
+      console.log('Applying filters...');
+    });
+
+    document.querySelector('.btn-secondary').addEventListener('click', function() {
+      alert('Exporting transactions to CSV...');
+    });
+  </script>
+</body>
+</html>

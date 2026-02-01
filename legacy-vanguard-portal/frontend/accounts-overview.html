@@ -1,0 +1,573 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Accounts Overview - Vanguard Asset Management Portal</title>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    /* Header - Vanguard Style */
+    .header {
+      background: #c00;
+      color: white;
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .logo {
+      background: #a00;
+      padding: 0 1.5rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 0;
+      height: 100%;
+      align-items: stretch;
+      margin-left: 2rem;
+    }
+
+    .header-nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      padding: 0 1.25rem;
+      display: flex;
+      align-items: center;
+      border-bottom: 4px solid transparent;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .header-nav a:hover {
+      background: rgba(0, 0, 0, 0.1);
+      border-bottom-color: #ff0;
+    }
+
+    .header-nav a.active {
+      border-bottom-color: white;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .header-right {
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-info {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Cards Grid */
+    .cards-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .card h3 {
+      font-size: 1rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 1rem;
+    }
+
+    /* Total Balance Card */
+    #totalBalanceCard .balance-amount {
+      font-size: 2rem;
+      font-weight: 700;
+      color: #c00;
+      margin-bottom: 0.5rem;
+    }
+
+    #totalBalanceCard .balance-change {
+      font-size: 0.875rem;
+      color: #10b981;
+      margin-bottom: 1rem;
+    }
+
+    #performanceChart {
+      margin-top: 1rem;
+      height: 120px;
+    }
+
+    /* Asset Mix */
+    #assetMixChart {
+      max-width: 250px;
+      margin: 1rem auto;
+    }
+
+    /* Tables */
+    .table-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table th {
+      text-align: left;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid #e5e7eb;
+      cursor: pointer;
+      user-select: none;
+    }
+
+    table th:hover {
+      color: #c00;
+    }
+
+    table th.sortable::after {
+      content: ' ⇅';
+      opacity: 0.3;
+      font-size: 0.75rem;
+    }
+
+    table td {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 0.9375rem;
+      color: #374151;
+    }
+
+    table tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    table tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    table tbody tr:nth-child(even):hover {
+      background: #f5f5f5;
+    }
+
+    .positive {
+      color: #10b981;
+      font-weight: 500;
+    }
+
+    .negative {
+      color: #ef4444;
+      font-weight: 500;
+    }
+
+    h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 1rem;
+    }
+
+    .backend-comment {
+      display: block;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      font-style: italic;
+      margin-top: 0.25rem;
+    }
+  </style>
+</head>
+<body>
+  <!-- Backend: NavigationServlet.java -->
+  <!-- Business Logic: SessionManager.getCurrentUser() -->
+
+  <!-- Header - Vanguard Style -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">Vanguard</div>
+      <nav class="header-nav">
+        <a href="accounts-overview.html" class="active">Accounts Overview</a>
+        <a href="balances-holdings.html">Balances & Holdings</a>
+        <a href="portfolio-performance.html">Performance</a>
+        <a href="transactions.html">Transactions</a>
+        <a href="risk-analysis.html">Risk Analysis</a>
+      </nav>
+    </div>
+    <div class="header-right">
+      <span class="user-info">Jacob Michelini</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+
+    <!-- Backend: AccountsOverviewServlet.java -->
+    <!-- Business Logic: AccountServiceImpl.getAccountSummary(userId) -->
+
+    <!-- Cards Grid -->
+    <div class="cards-grid">
+      <!-- Total Balance Card -->
+      <div class="card" id="totalBalanceCard">
+        <h3>Total Account Value</h3>
+        <span class="backend-comment"><!-- Backend: BalanceServiceImpl.calculateTotalBalance() --></span>
+        <div class="balance-amount">$68,917.42</div>
+        <div class="balance-change positive">+$2,847.19 (4.31%) This Year</div>
+        <canvas id="performanceChart"></canvas>
+      </div>
+
+      <!-- Asset Mix -->
+      <div class="card" id="assetMix">
+        <h3>Asset Mix</h3>
+        <span class="backend-comment"><!-- Backend: AssetAllocationServiceImpl.getAssetMix() --></span>
+        <canvas id="assetMixChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Accounts Table -->
+    <div class="table-container">
+      <h2>Account Summary</h2>
+      <span class="backend-comment"><!-- Backend: AccountServiceImpl.getAllAccounts(userId) --></span>
+      <table id="accountsTable">
+        <thead>
+          <tr>
+            <th class="sortable" data-column="name">Account Name</th>
+            <th class="sortable" data-column="number">Account Number</th>
+            <th class="sortable" data-column="type">Type</th>
+            <th class="sortable" data-column="balance">Balance</th>
+            <th class="sortable" data-column="ytd">YTD Return</th>
+          </tr>
+        </thead>
+        <tbody id="accountsTableBody">
+          <!-- Populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Recent Activity -->
+    <div class="table-container" id="recentActivity" style="margin-top: 1.5rem;">
+      <h2>Recent Activity</h2>
+      <span class="backend-comment"><!-- Backend: TransactionServiceImpl.getRecentTransactions(userId, limit=10) --></span>
+      <table id="recentActivityTable">
+        <thead>
+          <tr>
+            <th class="sortable" data-column="date">Date</th>
+            <th>Description</th>
+            <th>Account</th>
+            <th class="sortable" data-column="amount">Amount</th>
+          </tr>
+        </thead>
+        <tbody id="recentActivityBody">
+          <!-- Populated by JavaScript -->
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Mock data - Jacob Michelini's accounts
+    // Backend would call: AccountServiceImpl.getAllAccounts("jacob.michelini@vanguard.com")
+    const accounts = [
+      {
+        name: 'Individual Brokerage',
+        number: '****5626',
+        type: 'Brokerage',
+        balance: 28450.88,
+        ytdReturn: 5.24
+      },
+      {
+        name: 'Roth IRA',
+        number: '****7182',
+        type: 'Retirement',
+        balance: 24821.35,
+        ytdReturn: 4.89
+      },
+      {
+        name: 'Traditional 401(k)',
+        number: '****3309',
+        type: 'Retirement',
+        balance: 12445.19,
+        ytdReturn: 3.12
+      },
+      {
+        name: 'Taxable Investment',
+        number: '****9201',
+        type: 'Brokerage',
+        balance: 3200.00,
+        ytdReturn: 2.45
+      }
+    ];
+
+    // Recent transactions
+    // Backend would call: TransactionServiceImpl.getRecentTransactions(userId, 10)
+    const recentTransactions = [
+      { date: '2024-01-29', description: 'Dividend - VTI', account: '****5626', amount: 142.50 },
+      { date: '2024-01-28', description: 'Buy - VTSAX (5 shares)', account: '****7182', amount: -1247.85 },
+      { date: '2024-01-26', description: 'Dividend Reinvest - BND', account: '****5626', amount: 38.20 },
+      { date: '2024-01-25', description: 'Contribution', account: '****7182', amount: 500.00 },
+      { date: '2024-01-24', description: 'Sell - VXUS (3 shares)', account: '****3309', amount: 184.35 },
+      { date: '2024-01-22', description: 'Interest Payment', account: '****9201', amount: 8.42 },
+      { date: '2024-01-20', description: 'Buy - VTI (2 shares)', account: '****5626', amount: -498.40 },
+      { date: '2024-01-18', description: 'Dividend - VTSAX', account: '****7182', amount: 89.15 },
+      { date: '2024-01-15', description: 'Contribution', account: '****3309', amount: 250.00 },
+      { date: '2024-01-12', description: 'Fee - Annual Maintenance', account: '****5626', amount: -25.00 }
+    ];
+
+    // Populate accounts table
+    function populateAccountsTable() {
+      const tbody = document.getElementById('accountsTableBody');
+      tbody.innerHTML = accounts.map(acc => `
+        <tr>
+          <td>${acc.name}</td>
+          <td>${acc.number}</td>
+          <td>${acc.type}</td>
+          <td>$${acc.balance.toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}</td>
+          <td class="${acc.ytdReturn >= 0 ? 'positive' : 'negative'}">
+            ${acc.ytdReturn >= 0 ? '+' : ''}${acc.ytdReturn.toFixed(2)}%
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Populate recent activity table
+    function populateRecentActivity() {
+      const tbody = document.getElementById('recentActivityBody');
+      tbody.innerHTML = recentTransactions.map(txn => `
+        <tr>
+          <td>${txn.date}</td>
+          <td>${txn.description}</td>
+          <td>${txn.account}</td>
+          <td class="${txn.amount >= 0 ? 'positive' : 'negative'}">
+            ${txn.amount >= 0 ? '+' : ''}$${Math.abs(txn.amount).toLocaleString('en-US', { minimumFractionDigits: 2, maximumFractionDigits: 2 })}
+          </td>
+        </tr>
+      `).join('');
+    }
+
+    // Table sorting functionality
+    function setupTableSorting(tableId) {
+      const table = document.getElementById(tableId);
+      const headers = table.querySelectorAll('th.sortable');
+
+      headers.forEach(header => {
+        header.addEventListener('click', function() {
+          const column = this.dataset.column;
+          const tbody = table.querySelector('tbody');
+          const rows = Array.from(tbody.querySelectorAll('tr'));
+
+          // Toggle sort direction
+          const isAscending = this.classList.contains('asc');
+          headers.forEach(h => h.classList.remove('asc', 'desc'));
+          this.classList.add(isAscending ? 'desc' : 'asc');
+
+          // Sort rows
+          rows.sort((a, b) => {
+            const aValue = a.children[Array.from(this.parentNode.children).indexOf(this)].textContent;
+            const bValue = b.children[Array.from(this.parentNode.children).indexOf(this)].textContent;
+
+            // Try to parse as number
+            const aNum = parseFloat(aValue.replace(/[$,%+]/g, ''));
+            const bNum = parseFloat(bValue.replace(/[$,%+]/g, ''));
+
+            if (!isNaN(aNum) && !isNaN(bNum)) {
+              return isAscending ? bNum - aNum : aNum - bNum;
+            }
+
+            // String comparison
+            return isAscending
+              ? bValue.localeCompare(aValue)
+              : aValue.localeCompare(bValue);
+          });
+
+          // Re-append sorted rows
+          rows.forEach(row => tbody.appendChild(row));
+        });
+      });
+    }
+
+    // Performance Chart (Line Chart)
+    // Backend would call: PerformanceServiceImpl.getPerformanceHistory(userId, period="YTD")
+    function createPerformanceChart() {
+      const ctx = document.getElementById('performanceChart').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: ['Jan 1', 'Jan 8', 'Jan 15', 'Jan 22', 'Jan 29'],
+          datasets: [{
+            label: 'Portfolio Value',
+            data: [66070.23, 66842.15, 67324.88, 68105.42, 68917.42],
+            borderColor: '#c00',
+            backgroundColor: 'rgba(204, 0, 0, 0.1)',
+            borderWidth: 2,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 3,
+            pointBackgroundColor: '#c00'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              titleFont: { size: 13 },
+              bodyFont: { size: 12 },
+              padding: 10,
+              displayColors: false,
+              callbacks: {
+                label: function(context) {
+                  return '$' + context.parsed.y.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              ticks: {
+                callback: function(value) {
+                  return '$' + (value / 1000).toFixed(0) + 'K';
+                },
+                font: { size: 11 }
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              ticks: {
+                font: { size: 11 }
+              },
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Asset Mix Chart (Donut Chart)
+    // Backend would call: AssetAllocationServiceImpl.getAssetMix(userId)
+    function createAssetMixChart() {
+      const ctx = document.getElementById('assetMixChart').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'doughnut',
+        data: {
+          labels: ['Stocks', 'Bonds', 'Short-Term Reserves'],
+          datasets: [{
+            data: [72.14, 18.66, 9.20],
+            backgroundColor: [
+              '#c00',      // Vanguard red - Stocks
+              '#a00',      // Darker red - Bonds
+              '#ffb3b3'    // Light red - Short-term
+            ],
+            borderWidth: 2,
+            borderColor: '#fff'
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: true,
+          plugins: {
+            legend: {
+              position: 'bottom',
+              labels: {
+                padding: 15,
+                font: { size: 12 },
+                generateLabels: function(chart) {
+                  const data = chart.data;
+                  return data.labels.map((label, i) => ({
+                    text: label + ' (' + data.datasets[0].data[i].toFixed(2) + '%)',
+                    fillStyle: data.datasets[0].backgroundColor[i],
+                    hidden: false,
+                    index: i
+                  }));
+                }
+              }
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 10,
+              displayColors: true,
+              callbacks: {
+                label: function(context) {
+                  return context.label + ': ' + context.parsed.toFixed(2) + '%';
+                }
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Initialize page
+    document.addEventListener('DOMContentLoaded', function() {
+      populateAccountsTable();
+      populateRecentActivity();
+      createPerformanceChart();
+      createAssetMixChart();
+      setupTableSorting('accountsTable');
+      setupTableSorting('recentActivityTable');
+    });
+  </script>
+</body>
+</html>

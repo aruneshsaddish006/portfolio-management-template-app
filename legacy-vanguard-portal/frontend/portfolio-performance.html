@@ -1,0 +1,592 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Portfolio Performance - Vanguard Asset Management Portal</title>
+
+  <!-- Chart.js CDN -->
+  <script src="https://cdn.jsdelivr.net/npm/chart.js@4.4.1/dist/chart.umd.min.js"></script>
+
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    /* Header - Vanguard Style */
+    .header {
+      background: #c00;
+      color: white;
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .logo {
+      background: #a00;
+      padding: 0 1.5rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 0;
+      height: 100%;
+      align-items: stretch;
+      margin-left: 2rem;
+    }
+
+    .header-nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      padding: 0 1.25rem;
+      display: flex;
+      align-items: center;
+      border-bottom: 4px solid transparent;
+      transition: all 0.2s;
+      position: relative;
+    }
+
+    .header-nav a:hover {
+      background: rgba(0, 0, 0, 0.1);
+      border-bottom-color: #ff0;
+    }
+
+    .header-nav a.active {
+      border-bottom-color: white;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .header-right {
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-info {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 1200px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    /* Performance Cards */
+    .performance-cards {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(240px, 1fr));
+      gap: 1rem;
+      margin-bottom: 1.5rem;
+    }
+
+    .perf-card {
+      background: white;
+      padding: 1.25rem;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      border-left: 4px solid #c00;
+    }
+
+    .perf-card h3 {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-bottom: 0.5rem;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      font-weight: 600;
+    }
+
+    .perf-card .value {
+      font-size: 1.5rem;
+      font-weight: 700;
+      color: #111827;
+    }
+
+    .perf-card .subtext {
+      font-size: 0.875rem;
+      color: #6b7280;
+      margin-top: 0.25rem;
+    }
+
+    /* Chart Cards */
+    .chart-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-card h2 {
+      font-size: 1.25rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 1rem;
+    }
+
+    .chart-container {
+      position: relative;
+      height: 300px;
+    }
+
+    .chart-container.large {
+      height: 400px;
+    }
+
+    /* Period Selector */
+    .period-selector {
+      display: flex;
+      gap: 0.5rem;
+      margin-bottom: 1rem;
+    }
+
+    .period-btn {
+      padding: 0.5rem 1rem;
+      background: white;
+      border: 1px solid #d1d5db;
+      border-radius: 4px;
+      font-size: 0.875rem;
+      font-weight: 500;
+      color: #374151;
+      cursor: pointer;
+      transition: all 0.2s;
+    }
+
+    .period-btn:hover {
+      border-color: #c00;
+      color: #c00;
+    }
+
+    .period-btn.active {
+      background: #c00;
+      color: white;
+      border-color: #c00;
+    }
+
+    .positive {
+      color: #10b981;
+      font-weight: 500;
+    }
+
+    .negative {
+      color: #ef4444;
+      font-weight: 500;
+    }
+
+    .backend-comment {
+      display: block;
+      font-size: 0.75rem;
+      color: #9ca3af;
+      font-style: italic;
+      margin-top: 0.25rem;
+    }
+
+    /* Benchmark Table */
+    .table-container {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      overflow-x: auto;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table th {
+      text-align: left;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid #e5e7eb;
+    }
+
+    table td {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 0.9375rem;
+      color: #374151;
+    }
+
+    table tbody tr:hover {
+      background: #f9fafb;
+    }
+
+    table tbody tr:nth-child(even) {
+      background: #fafafa;
+    }
+
+    table tbody tr:nth-child(even):hover {
+      background: #f5f5f5;
+    }
+
+    .benchmark-name {
+      font-weight: 600;
+    }
+  </style>
+</head>
+<body>
+  <!-- Backend: NavigationServlet.java -->
+  <!-- Business Logic: SessionManager.getCurrentUser() -->
+
+  <!-- Header - Vanguard Style -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">Vanguard</div>
+      <nav class="header-nav">
+        <a href="accounts-overview.html">Accounts Overview</a>
+        <a href="balances-holdings.html">Balances & Holdings</a>
+        <a href="portfolio-performance.html" class="active">Performance</a>
+        <a href="transactions.html">Transactions</a>
+        <a href="risk-analysis.html">Risk Analysis</a>
+      </nav>
+    </div>
+    <div class="header-right">
+      <span class="user-info">Jacob Michelini</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+
+    <!-- Backend: PerformanceServlet.java -->
+    <!-- Business Logic: PerformanceServiceImpl.getPerformanceMetrics(userId) -->
+
+    <!-- Performance Summary Cards -->
+    <div class="performance-cards">
+      <div class="perf-card">
+        <h3>Total Return (YTD)</h3>
+        <span class="backend-comment"><!-- Backend: PerformanceServiceImpl.calculateYTDReturn() --></span>
+        <div class="value positive">+4.31%</div>
+        <div class="subtext">+$2,847.19</div>
+      </div>
+      <div class="perf-card">
+        <h3>1 Year Return</h3>
+        <div class="value positive">+12.87%</div>
+        <div class="subtext">+$7,892.45</div>
+      </div>
+      <div class="perf-card">
+        <h3>3 Year Return</h3>
+        <div class="value positive">+8.24%</div>
+        <div class="subtext">Annualized</div>
+      </div>
+      <div class="perf-card">
+        <h3>Since Inception</h3>
+        <div class="value positive">+15.67%</div>
+        <div class="subtext">Feb 2020</div>
+      </div>
+    </div>
+
+    <!-- Portfolio Value Over Time Chart -->
+    <div class="chart-card">
+      <h2>Portfolio Value Over Time</h2>
+      <span class="backend-comment"><!-- Backend: PerformanceServiceImpl.getPortfolioHistory(userId, period) --></span>
+      <div class="period-selector">
+        <button class="period-btn" data-period="1m">1 Month</button>
+        <button class="period-btn" data-period="3m">3 Months</button>
+        <button class="period-btn" data-period="6m">6 Months</button>
+        <button class="period-btn active" data-period="ytd">YTD</button>
+        <button class="period-btn" data-period="1y">1 Year</button>
+        <button class="period-btn" data-period="3y">3 Years</button>
+        <button class="period-btn" data-period="all">All Time</button>
+      </div>
+      <div class="chart-container large">
+        <canvas id="portfolioValueChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Asset Performance Chart -->
+    <div class="chart-card">
+      <h2>Performance by Asset Class</h2>
+      <span class="backend-comment"><!-- Backend: AssetAllocationServiceImpl.getAssetPerformance(userId) --></span>
+      <div class="chart-container">
+        <canvas id="assetPerformanceChart"></canvas>
+      </div>
+    </div>
+
+    <!-- Benchmark Comparison -->
+    <div class="table-container">
+      <h2>Benchmark Comparison (YTD)</h2>
+      <span class="backend-comment"><!-- Backend: BenchmarkServiceImpl.compareToBenchmarks(userId, period="YTD") --></span>
+      <table>
+        <thead>
+          <tr>
+            <th>Benchmark</th>
+            <th>Return (YTD)</th>
+            <th>Your Portfolio</th>
+            <th>Difference</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="benchmark-name">S&P 500 Index</td>
+            <td class="positive">+3.82%</td>
+            <td class="positive">+4.31%</td>
+            <td class="positive">+0.49%</td>
+          </tr>
+          <tr>
+            <td class="benchmark-name">Russell 2000 Index</td>
+            <td class="positive">+2.15%</td>
+            <td class="positive">+4.31%</td>
+            <td class="positive">+2.16%</td>
+          </tr>
+          <tr>
+            <td class="benchmark-name">MSCI EAFE Index</td>
+            <td class="positive">+1.94%</td>
+            <td class="positive">+4.31%</td>
+            <td class="positive">+2.37%</td>
+          </tr>
+          <tr>
+            <td class="benchmark-name">Bloomberg U.S. Aggregate Bond</td>
+            <td class="negative">-0.28%</td>
+            <td class="positive">+4.31%</td>
+            <td class="positive">+4.59%</td>
+          </tr>
+          <tr>
+            <td class="benchmark-name">60/40 Balanced Portfolio</td>
+            <td class="positive">+2.47%</td>
+            <td class="positive">+4.31%</td>
+            <td class="positive">+1.84%</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+  </div>
+
+  <script>
+    // Portfolio value historical data (YTD)
+    // Backend would call: PerformanceServiceImpl.getPortfolioHistory(userId, "YTD")
+    const portfolioData = {
+      '1m': {
+        labels: ['Dec 30', 'Jan 6', 'Jan 13', 'Jan 20', 'Jan 27', 'Jan 30'],
+        values: [67542.15, 67824.88, 68105.42, 68324.19, 68742.88, 68917.42]
+      },
+      '3m': {
+        labels: ['Nov 1', 'Nov 15', 'Dec 1', 'Dec 15', 'Jan 1', 'Jan 15', 'Jan 30'],
+        values: [64820.33, 65442.88, 66124.19, 66842.45, 67120.33, 67845.19, 68917.42]
+      },
+      '6m': {
+        labels: ['Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'],
+        values: [62445.88, 63124.19, 63842.45, 65120.33, 66445.88, 68917.42]
+      },
+      'ytd': {
+        labels: ['Jan 1', 'Jan 8', 'Jan 15', 'Jan 22', 'Jan 29'],
+        values: [66070.23, 66842.15, 67324.88, 68105.42, 68917.42]
+      },
+      '1y': {
+        labels: ['Feb', 'Mar', 'Apr', 'May', 'Jun', 'Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'],
+        values: [61025.00, 60842.33, 61445.88, 62124.19, 63442.88, 64120.33, 62445.88, 63124.19, 63842.45, 65120.33, 66445.88, 68917.42]
+      },
+      '3y': {
+        labels: ['2022', '2022 Q2', '2022 Q3', '2022 Q4', '2023 Q1', '2023 Q2', '2023 Q3', '2023 Q4', '2024 Q1'],
+        values: [55420.88, 52842.33, 54445.88, 56124.19, 58442.88, 60120.33, 62445.88, 65124.19, 68917.42]
+      },
+      'all': {
+        labels: ['2020', '2021', '2022', '2023', '2024'],
+        values: [59580.00, 58842.33, 56124.19, 63442.88, 68917.42]
+      }
+    };
+
+    let currentPeriod = 'ytd';
+    let portfolioChart = null;
+
+    // Create portfolio value chart
+    function createPortfolioChart(period = 'ytd') {
+      const ctx = document.getElementById('portfolioValueChart').getContext('2d');
+      const data = portfolioData[period];
+
+      if (portfolioChart) {
+        portfolioChart.destroy();
+      }
+
+      portfolioChart = new Chart(ctx, {
+        type: 'line',
+        data: {
+          labels: data.labels,
+          datasets: [{
+            label: 'Portfolio Value',
+            data: data.values,
+            borderColor: '#c00',
+            backgroundColor: 'rgba(204, 0, 0, 0.1)',
+            borderWidth: 3,
+            fill: true,
+            tension: 0.4,
+            pointRadius: 4,
+            pointBackgroundColor: '#c00',
+            pointBorderColor: '#fff',
+            pointBorderWidth: 2,
+            pointHoverRadius: 6
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              titleFont: { size: 14, weight: 'bold' },
+              bodyFont: { size: 13 },
+              padding: 12,
+              displayColors: false,
+              callbacks: {
+                label: function(context) {
+                  return '$' + context.parsed.y.toLocaleString('en-US', { minimumFractionDigits: 2 });
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: false,
+              ticks: {
+                callback: function(value) {
+                  return '$' + (value / 1000).toFixed(0) + 'K';
+                },
+                font: { size: 12 }
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              ticks: {
+                font: { size: 12 }
+              },
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Asset performance chart
+    // Backend would call: AssetAllocationServiceImpl.getAssetPerformance(userId)
+    function createAssetPerformanceChart() {
+      const ctx = document.getElementById('assetPerformanceChart').getContext('2d');
+
+      new Chart(ctx, {
+        type: 'bar',
+        data: {
+          labels: ['Stocks', 'Bonds', 'International', 'Money Market'],
+          datasets: [{
+            label: 'YTD Return (%)',
+            data: [5.84, -0.42, 3.12, 0.15],
+            backgroundColor: [
+              'rgba(204, 0, 0, 0.8)',
+              'rgba(239, 68, 68, 0.8)',
+              'rgba(170, 0, 0, 0.8)',
+              'rgba(255, 179, 179, 0.8)'
+            ],
+            borderColor: [
+              '#c00',
+              '#ef4444',
+              '#a00',
+              '#ffb3b3'
+            ],
+            borderWidth: 2
+          }]
+        },
+        options: {
+          responsive: true,
+          maintainAspectRatio: false,
+          plugins: {
+            legend: {
+              display: false
+            },
+            tooltip: {
+              backgroundColor: 'rgba(0, 0, 0, 0.8)',
+              padding: 12,
+              displayColors: true,
+              callbacks: {
+                label: function(context) {
+                  return context.parsed.y.toFixed(2) + '%';
+                }
+              }
+            }
+          },
+          scales: {
+            y: {
+              beginAtZero: true,
+              ticks: {
+                callback: function(value) {
+                  return value + '%';
+                },
+                font: { size: 12 }
+              },
+              grid: {
+                color: 'rgba(0, 0, 0, 0.05)'
+              }
+            },
+            x: {
+              ticks: {
+                font: { size: 12 }
+              },
+              grid: {
+                display: false
+              }
+            }
+          }
+        }
+      });
+    }
+
+    // Period selector
+    document.querySelectorAll('.period-btn').forEach(btn => {
+      btn.addEventListener('click', function() {
+        document.querySelectorAll('.period-btn').forEach(b => b.classList.remove('active'));
+        this.classList.add('active');
+
+        const period = this.dataset.period;
+        currentPeriod = period;
+        createPortfolioChart(period);
+      });
+    });
+
+    // Initialize charts
+    document.addEventListener('DOMContentLoaded', function() {
+      createPortfolioChart('ytd');
+      createAssetPerformanceChart();
+    });
+  </script>
+</body>
+</html>

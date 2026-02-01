@@ -1,0 +1,164 @@
+================================================================================
+LEGACY VANGUARD PORTAL - BACKEND CODEBASE STATISTICS
+================================================================================
+
+Created: 2026-01-31
+Purpose: Realistic legacy Java codebase for Slingshot modernization analysis
+
+--------------------------------------------------------------------------------
+FILE COUNTS
+--------------------------------------------------------------------------------
+Total Files:                    28
+Java Source Files:              23
+Configuration Files:            4
+Documentation Files:            3
+SQL Files:                      1
+
+--------------------------------------------------------------------------------
+CODE STATISTICS
+--------------------------------------------------------------------------------
+Total Lines of Code:            ~2,552
+Java Code:                      ~2,100 lines
+SQL:                            ~250 lines
+XML Configuration:              ~150 lines
+Documentation:                  ~1,200 lines
+
+Average File Size:              ~91 lines (code files)
+Largest File:                   BalancesHoldingsServlet.java (~230 lines)
+
+--------------------------------------------------------------------------------
+ANTI-PATTERNS INCLUDED
+--------------------------------------------------------------------------------
+1. N+1 Query Problem             [BalanceServiceImpl.java, lines 67-86]
+2. SQL Injection                 [HoldingsDAOImpl.java, lines 145-160]
+3. Synchronous Blocking          [BalancesHoldingsServlet.java, lines 133-215]
+4. Legacy SOAP Integration       [MarketDataServiceImpl.java]
+5. Long-Running Batch Job        [BalanceAggregationJob.java]
+6. Business Logic in Database    [schema.sql, stored procedure]
+
+--------------------------------------------------------------------------------
+LEGACY DEPENDENCIES
+--------------------------------------------------------------------------------
+Spring Framework:               4.3.18 (released 2018, 3 versions behind)
+Log4j:                          1.2.17 (EOL 2015, has CVEs)
+Servlet API:                    3.1 (Java EE 7, from 2013)
+MySQL Connector:                5.1.47 (older version)
+SOAP APIs:                      javax.xml.soap (2000s technology)
+
+--------------------------------------------------------------------------------
+PACKAGE STRUCTURE
+--------------------------------------------------------------------------------
+com.vanguard.portal
+├── batch/                      (1 file)  - Scheduled jobs
+├── dao/                        (6 files) - Data access layer
+├── model/                      (4 files) - Domain models
+├── service/                    (6 files) - Business logic
+├── servlet/                    (2 files) - Web controllers
+└── util/                       (1 file)  - Utilities
+
+--------------------------------------------------------------------------------
+CRITICAL FILES FOR SLINGSHOT ANALYSIS
+--------------------------------------------------------------------------------
+Priority 1 (Must Upload):
+  1. BalanceServiceImpl.java          - N+1 query problem
+  2. HoldingsDAOImpl.java             - SQL injection vulnerability
+  3. BalancesHoldingsServlet.java     - Synchronous blocking
+  4. MarketDataServiceImpl.java       - Legacy SOAP
+  5. BalanceAggregationJob.java       - Long-running batch
+  6. schema.sql                       - Business logic in DB
+  7. pom.xml                          - Legacy dependencies
+
+Priority 2 (Supporting Context):
+  8. AccountsOverviewServlet.java     - Main servlet pattern
+  9. web.xml                          - Servlet configuration
+  10. applicationContext.xml          - Spring configuration
+
+--------------------------------------------------------------------------------
+TECHNICAL DEBT SUMMARY
+--------------------------------------------------------------------------------
+Security Issues:                3 (SQL injection, Log4j CVE, hardcoded creds)
+Performance Issues:             3 (N+1 queries, sync blocking, SOAP latency)
+Scalability Issues:             2 (batch job, thread pool exhaustion)
+Maintainability Issues:         4 (DB logic, no tests, tight coupling, old deps)
+
+Total Identified Issues:        12
+
+Severity Breakdown:
+  CRITICAL:                     2 (SQL injection, Log4j)
+  HIGH:                         3 (N+1 queries, sync blocking, no tests)
+  MEDIUM:                       7 (SOAP, batch job, DB logic, etc.)
+
+--------------------------------------------------------------------------------
+MODERNIZATION ESTIMATE
+--------------------------------------------------------------------------------
+Lines of Code to Refactor:     ~1,500 (60% of codebase)
+Critical Security Fixes:        ~200 lines
+Performance Optimizations:      ~500 lines
+Framework Migration:            ~800 lines
+
+Estimated Effort:               4-6 weeks (1 senior developer)
+  Phase 1 (Security):           1 week
+  Phase 2 (Performance):        2 weeks
+  Phase 3 (Framework):          2-3 weeks
+
+--------------------------------------------------------------------------------
+DOMAIN COVERAGE
+--------------------------------------------------------------------------------
+Business Domain:               Financial Services (Investment Accounts)
+Features Implemented:
+  - Account management
+  - Balance tracking
+  - Holdings/portfolio management
+  - Transaction processing
+  - Market data integration
+  - CSV export functionality
+  - Batch aggregation
+
+Realistic Complexity:          Medium (typical enterprise application)
+
+--------------------------------------------------------------------------------
+TESTING COVERAGE
+--------------------------------------------------------------------------------
+Unit Tests:                    0 (legacy codebase, no tests)
+Integration Tests:             0
+End-to-End Tests:              0
+
+Test Coverage:                 0%
+(This is intentional to reflect realistic legacy codebase)
+
+--------------------------------------------------------------------------------
+DOCUMENTATION
+--------------------------------------------------------------------------------
+BACKEND_README.md              - Architecture overview and issues
+SLINGSHOT_GUIDE.md             - How to analyze with Slingshot
+ANTI_PATTERNS_QUICK_REF.md     - Quick reference for all anti-patterns
+PROJECT_STATS.txt              - This file
+
+Total Documentation:           ~1,200 lines
+
+--------------------------------------------------------------------------------
+REALISTIC LEGACY CHARACTERISTICS
+--------------------------------------------------------------------------------
+✓ Outdated dependencies (Spring 4.x, Log4j 1.2)
+✓ No unit tests (typical for 2013-era code)
+✓ Security vulnerabilities (SQL injection, CVEs)
+✓ Performance issues (N+1 queries, sync operations)
+✓ Legacy integration patterns (SOAP instead of REST)
+✓ Business logic in database (stored procedures)
+✓ Minimal error handling
+✓ No caching layer
+✓ Hardcoded configuration values
+✓ Verbose boilerplate code
+
+--------------------------------------------------------------------------------
+USAGE INSTRUCTIONS
+--------------------------------------------------------------------------------
+1. Upload critical files (7 files) to Slingshot
+2. Ask for comprehensive analysis
+3. Request specific anti-pattern fixes
+4. Generate modernization roadmap
+5. Prioritize security fixes first
+
+See SLINGSHOT_GUIDE.md for detailed instructions.
+
+================================================================================

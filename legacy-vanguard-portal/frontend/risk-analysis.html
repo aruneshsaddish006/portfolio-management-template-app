@@ -1,0 +1,629 @@
+<!DOCTYPE html>
+<html lang="en">
+<head>
+  <meta charset="UTF-8">
+  <meta name="viewport" content="width=device-width, initial-scale=1.0">
+  <title>Risk Analysis - Vanguard Portfolio</title>
+  <script src="https://cdn.jsdelivr.net/npm/chart.js"></script>
+  <style>
+    * {
+      margin: 0;
+      padding: 0;
+      box-sizing: border-box;
+    }
+
+    body {
+      font-family: 'Segoe UI', Tahoma, Geneva, Verdana, sans-serif;
+      background: #f5f5f5;
+      color: #333;
+    }
+
+    /* Header - Vanguard Style */
+    .header {
+      background: #c00;
+      color: white;
+      padding: 0;
+      box-shadow: 0 2px 4px rgba(0, 0, 0, 0.1);
+      display: flex;
+      align-items: center;
+      justify-content: space-between;
+      height: 60px;
+    }
+
+    .header-left {
+      display: flex;
+      align-items: center;
+      height: 100%;
+    }
+
+    .logo {
+      background: #a00;
+      padding: 0 1.5rem;
+      height: 100%;
+      display: flex;
+      align-items: center;
+      font-size: 1.75rem;
+      font-weight: 700;
+      color: white;
+      letter-spacing: -0.5px;
+    }
+
+    .header-nav {
+      display: flex;
+      gap: 0;
+      height: 100%;
+      align-items: stretch;
+      margin-left: 2rem;
+    }
+
+    .header-nav a {
+      color: white;
+      text-decoration: none;
+      font-size: 0.9375rem;
+      font-weight: 500;
+      padding: 0 1.25rem;
+      display: flex;
+      align-items: center;
+      border-bottom: 4px solid transparent;
+      transition: all 0.2s;
+    }
+
+    .header-nav a:hover {
+      background: rgba(0, 0, 0, 0.1);
+      border-bottom-color: #ff0;
+    }
+
+    .header-nav a.active {
+      border-bottom-color: white;
+      background: rgba(0, 0, 0, 0.15);
+    }
+
+    .header-right {
+      padding: 0 1.5rem;
+      display: flex;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .user-info {
+      font-size: 0.875rem;
+      color: rgba(255, 255, 255, 0.9);
+    }
+
+    /* Main Content */
+    .container {
+      max-width: 1400px;
+      margin: 0 auto;
+      padding: 2rem;
+    }
+
+    .page-header {
+      margin-bottom: 2rem;
+    }
+
+    .page-header h1 {
+      font-size: 1.875rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 0.5rem;
+    }
+
+    .page-header p {
+      font-size: 0.9375rem;
+      color: #6b7280;
+    }
+
+    /* Risk Score Card */
+    .risk-score-card {
+      background: white;
+      padding: 2rem;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+      display: grid;
+      grid-template-columns: 1fr 2fr;
+      gap: 2rem;
+      align-items: center;
+    }
+
+    .risk-gauge {
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      gap: 1rem;
+    }
+
+    .gauge-circle {
+      width: 200px;
+      height: 200px;
+      border-radius: 50%;
+      background: conic-gradient(
+        from 0deg,
+        #10b981 0deg 120deg,
+        #f59e0b 120deg 240deg,
+        #ef4444 240deg 360deg
+      );
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      position: relative;
+    }
+
+    .gauge-inner {
+      width: 160px;
+      height: 160px;
+      border-radius: 50%;
+      background: white;
+      display: flex;
+      flex-direction: column;
+      align-items: center;
+      justify-content: center;
+    }
+
+    .risk-score {
+      font-size: 3rem;
+      font-weight: 700;
+      color: #c00;
+    }
+
+    .risk-label {
+      font-size: 0.875rem;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+    }
+
+    .risk-description h2 {
+      font-size: 1.5rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 1rem;
+    }
+
+    .risk-description p {
+      font-size: 0.9375rem;
+      color: #6b7280;
+      line-height: 1.6;
+      margin-bottom: 1rem;
+    }
+
+    .risk-factors {
+      display: flex;
+      flex-direction: column;
+      gap: 0.5rem;
+    }
+
+    .risk-factor {
+      display: flex;
+      align-items: center;
+      gap: 0.5rem;
+      font-size: 0.875rem;
+    }
+
+    .factor-icon {
+      width: 20px;
+      height: 20px;
+      border-radius: 50%;
+      display: flex;
+      align-items: center;
+      justify-content: center;
+      font-size: 0.75rem;
+      font-weight: 700;
+    }
+
+    .factor-low {
+      background: #d1fae5;
+      color: #065f46;
+    }
+
+    .factor-medium {
+      background: #fef3c7;
+      color: #92400e;
+    }
+
+    .factor-high {
+      background: #fee2e2;
+      color: #991b1b;
+    }
+
+    /* Metrics Grid */
+    .metrics-grid {
+      display: grid;
+      grid-template-columns: repeat(auto-fit, minmax(280px, 1fr));
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .metric-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .metric-card h3 {
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      margin-bottom: 1rem;
+    }
+
+    .metric-value {
+      font-size: 1.875rem;
+      font-weight: 700;
+      color: #111827;
+      margin-bottom: 0.5rem;
+    }
+
+    .metric-description {
+      font-size: 0.875rem;
+      color: #6b7280;
+    }
+
+    .metric-change {
+      font-size: 0.875rem;
+      font-weight: 600;
+      margin-top: 0.5rem;
+    }
+
+    .positive {
+      color: #10b981;
+    }
+
+    .negative {
+      color: #ef4444;
+    }
+
+    /* Charts */
+    .charts-grid {
+      display: grid;
+      grid-template-columns: 1fr 1fr;
+      gap: 1.5rem;
+      margin-bottom: 2rem;
+    }
+
+    .chart-card {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+    }
+
+    .chart-card h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 1.5rem;
+    }
+
+    .chart-container {
+      height: 300px;
+    }
+
+    /* Stress Test Results */
+    .stress-test-table {
+      background: white;
+      padding: 1.5rem;
+      border-radius: 4px;
+      box-shadow: 0 1px 3px rgba(0, 0, 0, 0.1);
+      margin-bottom: 2rem;
+    }
+
+    .stress-test-table h3 {
+      font-size: 1.125rem;
+      font-weight: 600;
+      color: #111827;
+      margin-bottom: 1.5rem;
+    }
+
+    table {
+      width: 100%;
+      border-collapse: collapse;
+    }
+
+    table th {
+      text-align: left;
+      font-size: 0.8125rem;
+      font-weight: 600;
+      color: #6b7280;
+      text-transform: uppercase;
+      letter-spacing: 0.05em;
+      padding: 0.75rem 1rem;
+      border-bottom: 2px solid #e5e7eb;
+      background: #f9fafb;
+    }
+
+    table td {
+      padding: 1rem;
+      border-bottom: 1px solid #f3f4f6;
+      font-size: 0.9375rem;
+      color: #374151;
+    }
+
+    table tr:hover {
+      background: #f9fafb;
+    }
+
+    .scenario-name {
+      font-weight: 600;
+      color: #111827;
+    }
+
+    @media (max-width: 1024px) {
+      .charts-grid {
+        grid-template-columns: 1fr;
+      }
+
+      .risk-score-card {
+        grid-template-columns: 1fr;
+      }
+    }
+  </style>
+</head>
+<body>
+  <!-- Header -->
+  <div class="header">
+    <div class="header-left">
+      <div class="logo">Vanguard</div>
+      <nav class="header-nav">
+        <a href="accounts-overview.html">Accounts Overview</a>
+        <a href="balances-holdings.html">Balances & Holdings</a>
+        <a href="portfolio-performance.html">Performance</a>
+        <a href="transactions.html">Transactions</a>
+        <a href="risk-analysis.html" class="active">Risk Analysis</a>
+      </nav>
+    </div>
+    <div class="header-right">
+      <span class="user-info">Jacob Michelini</span>
+    </div>
+  </div>
+
+  <!-- Main Content -->
+  <div class="container">
+    <div class="page-header">
+      <h1>Portfolio Risk Analysis</h1>
+      <p>Comprehensive risk metrics and stress testing for your investment portfolio</p>
+    </div>
+
+    <!-- Risk Score Card -->
+    <div class="risk-score-card">
+      <div class="risk-gauge">
+        <div class="gauge-circle">
+          <div class="gauge-inner">
+            <div class="risk-score">6.2</div>
+            <div class="risk-label">Risk Score</div>
+          </div>
+        </div>
+        <p style="font-size: 0.875rem; color: #6b7280; text-align: center;">
+          Moderate Risk Profile<br>
+          <span style="color: #10b981;">Within target range</span>
+        </p>
+      </div>
+      <div class="risk-description">
+        <h2>Your Portfolio Risk Assessment</h2>
+        <p>Your portfolio exhibits a moderate risk profile with a score of 6.2 out of 10. This aligns well with your stated investment objective of balanced growth and income.</p>
+        <div class="risk-factors">
+          <div class="risk-factor">
+            <span class="factor-icon factor-medium">M</span>
+            <span><strong>Volatility:</strong> 14.2% annualized (moderate)</span>
+          </div>
+          <div class="risk-factor">
+            <span class="factor-icon factor-low">L</span>
+            <span><strong>Concentration:</strong> Well diversified across sectors</span>
+          </div>
+          <div class="risk-factor">
+            <span class="factor-icon factor-low">L</span>
+            <span><strong>Credit Risk:</strong> High-quality bonds (AA average)</span>
+          </div>
+          <div class="risk-factor">
+            <span class="factor-icon factor-medium">M</span>
+            <span><strong>Market Beta:</strong> 0.89 (slightly defensive)</span>
+          </div>
+        </div>
+      </div>
+    </div>
+
+    <!-- Key Metrics -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <h3>Value at Risk (95%)</h3>
+        <div class="metric-value negative">-$8,473</div>
+        <div class="metric-description">Maximum expected 1-day loss (95% confidence)</div>
+        <div class="metric-change negative">1.0% of portfolio value</div>
+      </div>
+      <div class="metric-card">
+        <h3>Portfolio Beta</h3>
+        <div class="metric-value">0.89</div>
+        <div class="metric-description">Relative to S&P 500 benchmark</div>
+        <div class="metric-change positive">11% less volatile than market</div>
+      </div>
+      <div class="metric-card">
+        <h3>Sharpe Ratio</h3>
+        <div class="metric-value">1.42</div>
+        <div class="metric-description">Risk-adjusted return measure</div>
+        <div class="metric-change positive">Above market average (1.1)</div>
+      </div>
+      <div class="metric-card">
+        <h3>Maximum Drawdown</h3>
+        <div class="metric-value negative">-12.4%</div>
+        <div class="metric-description">Largest peak-to-trough decline (12 months)</div>
+        <div class="metric-change">Recovery time: 87 days</div>
+      </div>
+    </div>
+
+    <!-- Charts -->
+    <div class="charts-grid">
+      <div class="chart-card">
+        <h3>Sector Concentration</h3>
+        <div class="chart-container">
+          <canvas id="sectorChart"></canvas>
+        </div>
+      </div>
+      <div class="chart-card">
+        <h3>Historical Volatility (30-Day Rolling)</h3>
+        <div class="chart-container">
+          <canvas id="volatilityChart"></canvas>
+        </div>
+      </div>
+    </div>
+
+    <!-- Stress Test Results -->
+    <div class="stress-test-table">
+      <h3>Stress Test Scenarios</h3>
+      <table>
+        <thead>
+          <tr>
+            <th>Scenario</th>
+            <th>Description</th>
+            <th>Expected Loss</th>
+            <th>Portfolio Impact</th>
+            <th>Recovery Time</th>
+          </tr>
+        </thead>
+        <tbody>
+          <tr>
+            <td class="scenario-name">2008 Financial Crisis</td>
+            <td>Market decline similar to 2008-2009</td>
+            <td class="negative">-$169,478</td>
+            <td class="negative">-20.0%</td>
+            <td>18-24 months</td>
+          </tr>
+          <tr>
+            <td class="scenario-name">COVID-19 Pandemic</td>
+            <td>Sharp decline followed by rapid recovery</td>
+            <td class="negative">-$118,295</td>
+            <td class="negative">-14.0%</td>
+            <td>6-9 months</td>
+          </tr>
+          <tr>
+            <td class="scenario-name">Black Monday (1987)</td>
+            <td>Single-day 20% market crash</td>
+            <td class="negative">-$152,332</td>
+            <td class="negative">-18.0%</td>
+            <td>12-15 months</td>
+          </tr>
+          <tr>
+            <td class="scenario-name">Interest Rate Spike</td>
+            <td>Fed raises rates by 200 basis points</td>
+            <td class="negative">-$84,739</td>
+            <td class="negative">-10.0%</td>
+            <td>9-12 months</td>
+          </tr>
+          <tr>
+            <td class="scenario-name">Tech Bubble (2000)</td>
+            <td>Tech sector crash similar to dot-com burst</td>
+            <td class="negative">-$101,687</td>
+            <td class="negative">-12.0%</td>
+            <td>24-36 months</td>
+          </tr>
+        </tbody>
+      </table>
+    </div>
+
+    <!-- Additional Metrics -->
+    <div class="metrics-grid">
+      <div class="metric-card">
+        <h3>Liquidity Ratio</h3>
+        <div class="metric-value">94.2%</div>
+        <div class="metric-description">Assets that can be sold within 1 business day</div>
+        <div class="metric-change positive">High liquidity portfolio</div>
+      </div>
+      <div class="metric-card">
+        <h3>Correlation to Market</h3>
+        <div class="metric-value">0.87</div>
+        <div class="metric-description">Correlation coefficient with S&P 500</div>
+        <div class="metric-change">Strong positive correlation</div>
+      </div>
+      <div class="metric-card">
+        <h3>Downside Deviation</h3>
+        <div class="metric-value">9.8%</div>
+        <div class="metric-description">Volatility of negative returns only</div>
+        <div class="metric-change">Used for Sortino ratio calculation</div>
+      </div>
+      <div class="metric-card">
+        <h3>Alpha (Jensen's)</h3>
+        <div class="metric-value positive">+2.3%</div>
+        <div class="metric-description">Excess return vs. expected return</div>
+        <div class="metric-change positive">Outperforming benchmark</div>
+      </div>
+    </div>
+  </div>
+
+  <script>
+    // Sector Concentration Chart
+    const sectorCtx = document.getElementById('sectorChart').getContext('2d');
+    new Chart(sectorCtx, {
+      type: 'doughnut',
+      data: {
+        labels: ['Technology', 'Financial Services', 'Healthcare', 'Consumer Goods', 'Bonds', 'Other'],
+        datasets: [{
+          data: [28, 18, 15, 12, 22, 5],
+          backgroundColor: [
+            '#c00',
+            '#e63946',
+            '#f08080',
+            '#ffb3b3',
+            '#6b7280',
+            '#d1d5db'
+          ],
+          borderWidth: 0
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        plugins: {
+          legend: {
+            position: 'right'
+          }
+        }
+      }
+    });
+
+    // Historical Volatility Chart
+    const volatilityCtx = document.getElementById('volatilityChart').getContext('2d');
+    new Chart(volatilityCtx, {
+      type: 'line',
+      data: {
+        labels: ['Jul', 'Aug', 'Sep', 'Oct', 'Nov', 'Dec', 'Jan'],
+        datasets: [{
+          label: 'Portfolio Volatility',
+          data: [12.5, 13.2, 14.8, 16.2, 15.1, 14.5, 14.2],
+          borderColor: '#c00',
+          backgroundColor: 'rgba(204, 0, 0, 0.1)',
+          fill: true,
+          tension: 0.4
+        }, {
+          label: 'Market Volatility (S&P 500)',
+          data: [14.2, 15.1, 16.8, 18.5, 17.2, 16.1, 15.8],
+          borderColor: '#6b7280',
+          backgroundColor: 'rgba(107, 114, 128, 0.1)',
+          fill: true,
+          tension: 0.4
+        }]
+      },
+      options: {
+        responsive: true,
+        maintainAspectRatio: false,
+        scales: {
+          y: {
+            beginAtZero: false,
+            ticks: {
+              callback: function(value) {
+                return value + '%';
+              }
+            }
+          }
+        },
+        plugins: {
+          legend: {
+            position: 'top'
+          }
+        }
+      }
+    });
+  </script>
+</body>
+</html>
